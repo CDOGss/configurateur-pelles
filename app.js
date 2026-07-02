@@ -381,5 +381,111 @@ document.getElementById("btnExport").addEventListener("click", () => {
 });
 document.getElementById("btnGit").href = REPO_URL;
 
+/* ============================================================
+   Enregistrer / Charger une configuration (fichier .json)
+   ============================================================ */
+// Format robuste : on exporte le nom + la colonne de chaque attache,
+// pour pouvoir recharger même si l'ordre du stock a changé.
+function construireConfig() {
+  return {
+    app: "configurateur-pelles",
+    version: 2,
+    date: new Date().toISOString(),
+    machines: MACHINES.map((m) => ({
+      id: m.id,
+      matricule: m.matricule,
+      designation: m.designation,
+      attaches: assigned[m.id].map((id) => {
+        const a = ATTACH_BY_ID[id];
+        return { id: a.id, name: a.name, col: a.col };
+      }),
+    })),
+  };
+}
+
+document.getElementById("btnSave").addEventListener("click", () => {
+  const data = construireConfig();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  const nom = `config-pelles-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`;
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nom;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// Le bouton "Charger" ouvre le sélecteur de fichier
+const fileLoad = document.getElementById("fileLoad");
+document.getElementById("btnLoad").addEventListener("click", () => fileLoad.click());
+fileLoad.addEventListener("change", (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      appliquerConfig(JSON.parse(reader.result));
+    } catch (err) {
+      alert("Fichier illisible : ce n'est pas un .json de configuration valide.");
+    }
+    fileLoad.value = ""; // permet de recharger le même fichier ensuite
+  };
+  reader.readAsText(f);
+});
+
+// Applique une config chargée, en re-résolvant chaque attache dans le stock actuel
+function appliquerConfig(obj) {
+  if (!obj || (!obj.machines && !obj.assigned)) {
+    alert("Ce fichier ne contient pas de configuration reconnue.");
+    return;
+  }
+  MACHINES.forEach((m) => (assigned[m.id] = []));
+  const used = new Set();
+  let placees = 0, ignorees = 0;
+
+  const resoudre = (at) => {
+    // 1) même id encore valide et non utilisé
+    if (at.id && ATTACH_BY_ID[at.id] && !used.has(at.id) &&
+        ATTACH_BY_ID[at.id].name === at.name && ATTACH_BY_ID[at.id].col === at.col) {
+      return at.id;
+    }
+    // 2) sinon, une attache disponible de même nom + même colonne
+    const c = ATTACHES.find((a) => a.col === at.col && a.name === at.name && !used.has(a.id));
+    return c ? c.id : null;
+  };
+
+  if (obj.machines) {
+    obj.machines.forEach((entry) => {
+      const m =
+        (entry.matricule && entry.matricule !== "????" && MACHINES.find((x) => x.matricule === entry.matricule)) ||
+        MACHINES.find((x) => x.designation === entry.designation) ||
+        MACHINES.find((x) => x.id === entry.id);
+      if (!m) { ignorees += (entry.attaches || []).length; return; }
+      (entry.attaches || []).forEach((at) => {
+        const aid = resoudre(at);
+        if (aid) { used.add(aid); assigned[m.id].push(aid); placees++; }
+        else ignorees++;
+      });
+    });
+  } else {
+    // ancien format { assigned: { mId: [ids] } }
+    Object.entries(obj.assigned).forEach(([mid, ids]) => {
+      if (!assigned[mid]) return;
+      ids.forEach((id) => {
+        if (ATTACH_BY_ID[id] && !used.has(id)) { used.add(id); assigned[mid].push(id); placees++; }
+        else ignorees++;
+      });
+    });
+  }
+
+  activeMachineId = null;
+  saveState();
+  render();
+  alert(`Configuration chargée : ${placees} attache(s) placée(s)` +
+        (ignorees ? `, ${ignorees} ignorée(s) (absente(s) du stock actuel).` : "."));
+}
+
 /* ---------- Go ---------- */
 render();
