@@ -30,8 +30,25 @@ Démonstrateur d'**amélioration continue** — 100 % statique, aucun serveur re
 | `app.js` | Rendu, glisser-déposer, pelle LEGO SVG, sauvegarde |
 | `Lesstocks.xlsx` | Fichier source du stock |
 
-## ✏️ Mettre à jour les données
+## ✏️ Mettre à jour les données (recommandé : le script Python)
 
-Tout est dans **`data.js`** : modifiez `STOCK` (attaches par colonne) ou `MACHINES` (désignation, matricule, tonnage, type). Aucune compilation nécessaire.
+Le plus simple : déposez vos **deux fichiers Excel** à la racine et lancez le générateur.
+
+```bash
+python generer_data.py
+# ou en précisant les fichiers :
+python generer_data.py MonStock.xlsx MesMachines.xlsx
+```
+
+Le script relit vos fichiers et réécrit **`data.js`** ; rechargez la page, c'est à jour.
+
+**Modèles à respecter** (dans le dossier `modeles/`, déjà pré-remplis avec vos données) :
+
+- **`Modele_stock.xlsx`** — ligne 1 = les en-têtes (types d'attelage) ; chaque colonne liste ses attaches de haut en bas. Gardez le **même nombre de colonnes et les mêmes en-têtes**.
+- **`Modele_machines.xlsx`** — colonnes `Designation`, `Matricule` (obligatoires) et, en option, `Tonnage` et `Type`. Laissés vides, le **tonnage** (ex. `DX380` → 38 t) et le **type** (`LC` → chenilles, `W`/`WR` → pneus) sont **déduits automatiquement**.
+
+> Prérequis : Python 3 + `pip install openpyxl`.
+
+Alternative manuelle : éditer directement **`data.js`** (`STOCK` et `MACHINES`). Aucune compilation nécessaire.
 
 > ℹ️ Matricule `????` de la dernière pelle (`PELLE DX210W-7K`) à compléter.

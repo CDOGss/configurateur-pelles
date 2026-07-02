@@ -16,6 +16,11 @@ COLONNES.forEach((col) => {
   });
 });
 const ATTACH_BY_ID = Object.fromEntries(ATTACHES.map((a) => [a.id, a]));
+const COL_BY_ID = Object.fromEntries(COLONNES.map((c) => [c.id, c]));
+// Couleur d'une colonne : celle générée dans data.js, sinon repli sur le CSS.
+function couleurCol(colId) {
+  return (COL_BY_ID[colId] && COL_BY_ID[colId].couleur) || `var(--c-${colId})`;
+}
 
 /* ---------- État (persisté) ---------- */
 // assigned[machineId] = [attacheId, ...] dans l'ordre d'affectation
@@ -164,7 +169,7 @@ const elPalette  = document.getElementById("palette");
 const elMachines = document.getElementById("machines");
 
 function chipHTML(attach, { removable = false } = {}) {
-  const color = `var(--c-${attach.col})`;
+  const color = couleurCol(attach.col);
   return `
     <div class="chip" data-id="${attach.id}" ${removable ? "" : 'data-draggable="1"'}
          style="--chip:${color}" title="${attach.name} · ${attach.col}">
@@ -182,7 +187,7 @@ function renderPalette() {
       : "";
     return `
       <div class="pal-col">
-        <div class="pal-col-head" style="background:var(--c-${col.id})">
+        <div class="pal-col-head" style="background:${couleurCol(col.id)}">
           ${col.titre}<span class="pal-col-count">${items.length}</span>
         </div>
         <div class="pal-col-body${items.length ? "" : " empty"}">${body}</div>
