@@ -105,13 +105,14 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 /* ---------------- Palette des attaches ---------------- */
 .palette {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(150px, 1fr));
   gap: 12px;
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 14px;
   box-shadow: var(--shadow);
+  overflow-x: auto; /* 8 colonnes toujours alignées, défilement si écran étroit */
 }
 .pal-col { display: flex; flex-direction: column; min-width: 0; }
 .pal-col-head {
@@ -139,10 +140,10 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 /* ---------------- Étiquette (attache) ---------------- */
 .chip {
   position: relative;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: flex-start; gap: 6px;
   background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--chip, #888);
   border-radius: 8px; padding: 7px 9px;
-  font-size: .78rem; font-weight: 600; line-height: 1.2;
+  font-size: .78rem; font-weight: 600; line-height: 1.25;
   cursor: grab; user-select: none;
   box-shadow: var(--shadow-sm);
   transition: box-shadow .12s, transform .08s, opacity .12s;
@@ -150,8 +151,9 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 }
 .chip:hover { box-shadow: 0 4px 12px rgba(29,36,48,.14); transform: translateY(-1px); }
 .chip.dragging { opacity: .35; }
-.chip .chip-ico { flex: 0 0 auto; font-size: .95rem; line-height: 1; }
-.chip .chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip .chip-ico { flex: 0 0 auto; font-size: .95rem; line-height: 1.25; }
+/* désignation complète : le texte s'enroule, jamais tronqué */
+.chip .chip-name { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; hyphens: none; }
 .chip .chip-remove {
   flex: 0 0 auto; border: none; background: transparent; color: var(--ink-soft);
   cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 2px; border-radius: 4px;
