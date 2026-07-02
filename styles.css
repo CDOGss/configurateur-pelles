@@ -105,7 +105,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 /* ---------------- Palette des attaches ---------------- */
 .palette {
   display: grid;
-  grid-template-columns: repeat(8, minmax(150px, 1fr));
+  grid-template-columns: repeat(8, minmax(172px, 1fr));
   gap: 12px;
   background: var(--bg-panel);
   border: 1px solid var(--line);
