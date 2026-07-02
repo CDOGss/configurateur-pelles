@@ -44,6 +44,7 @@ const STOCK = {
   ],
   S60: [
     "Fourche Palette", "Fouille Arden 1100", "Fouille Arden 500", "Curage Arden 1800",
+    "Attache QCS60", "Attache QCS60",
   ],
   S70: [
     "Fouille Arden 600", "Fouille 900", "Curage Arden 2200",
