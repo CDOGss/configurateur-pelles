@@ -1,0 +1,254 @@
+/* ============================================================
+   Configurateur de pelles — feuille de style
+   ============================================================ */
+:root {
+  --orange:      #f6811f;
+  --orange-dk:   #d96a0c;
+  --ink:         #1d2430;
+  --ink-soft:    #5a6472;
+  --bg:          #eef1f5;
+  --bg-panel:    #ffffff;
+  --line:        #dde3ec;
+  --red:         #e5484d;
+  --red-soft:    #fdecec;
+  --green:       #2f9e44;
+  --green-soft:  #e9f7ec;
+  --shadow:      0 10px 30px rgba(29, 36, 48, .10);
+  --shadow-sm:   0 2px 6px rgba(29, 36, 48, .10);
+  --radius:      14px;
+
+  /* couleurs par type d'attelage (colonnes) */
+  --c-DIAM65:  #2f80ed;
+  --c-DIAM80:  #9b51e0;
+  --c-DIAM90:  #eb5757;
+  --c-DIAM100: #e2892b;
+  --c-S50:     #17a398;
+  --c-S60:     #2d9cdb;
+  --c-S70:     #6a994e;
+  --c-Dx100:   #7a6ff0;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 500px at 15% -10%, #fff6ec 0%, transparent 55%),
+    radial-gradient(1000px 500px at 100% 0%, #eaf1ff 0%, transparent 50%),
+    var(--bg);
+  min-height: 100vh;
+}
+
+/* ---------------- Barre supérieure ---------------- */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 18px; flex-wrap: wrap;
+  padding: 14px 26px;
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-logo {
+  position: relative;
+  width: 46px; height: 46px; border-radius: 12px;
+  background: linear-gradient(160deg, var(--orange), var(--orange-dk));
+  box-shadow: var(--shadow-sm);
+  display: grid; place-items: center; gap: 4px;
+  grid-auto-flow: column;
+}
+.brand-logo .stud {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: #fff; opacity: .92;
+  box-shadow: inset 0 -2px 2px rgba(0,0,0,.15);
+}
+.brand-text h1 { margin: 0; font-size: 1.18rem; font-weight: 800; letter-spacing: -.02em; }
+.brand-text p  { margin: 2px 0 0; font-size: .82rem; color: var(--ink-soft); }
+
+.topbar-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.progress-pill {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 6px 16px; border-radius: 999px; line-height: 1.1;
+  background: var(--red-soft); border: 1px solid #f6c9ca;
+  transition: background .3s, border-color .3s;
+}
+.progress-pill.done { background: var(--green-soft); border-color: #bfe4c6; }
+.progress-count { font-weight: 800; font-size: .98rem; }
+.progress-label { font-size: .68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .04em; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--line); background: #fff; color: var(--ink);
+  font: inherit; font-weight: 600; font-size: .86rem;
+  padding: 9px 14px; border-radius: 10px; cursor: pointer;
+  transition: transform .08s, box-shadow .15s, background .15s, border-color .15s;
+  text-decoration: none;
+}
+.btn:hover { box-shadow: var(--shadow-sm); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--orange); border-color: var(--orange-dk); color: #fff; }
+.btn-primary:hover { background: var(--orange-dk); }
+.btn-git { background: var(--ink); border-color: var(--ink); color: #fff; }
+.btn-ghost { background: transparent; }
+
+/* ---------------- Sections ---------------- */
+main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
+.section-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 26px 4px 12px; }
+.section-head h2 { margin: 0; font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; }
+.hint { font-size: .82rem; color: var(--ink-soft); }
+.txt-red { color: var(--red); } .txt-green { color: var(--green); }
+
+/* ---------------- Palette des attaches ---------------- */
+.palette {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.pal-col { display: flex; flex-direction: column; min-width: 0; }
+.pal-col-head {
+  position: relative;
+  text-align: center; font-weight: 800; font-size: .8rem; color: #fff;
+  padding: 7px 6px; border-radius: 9px 9px 0 0;
+  letter-spacing: .02em;
+}
+.pal-col-count {
+  display: inline-block; margin-left: 6px;
+  background: rgba(255,255,255,.28); border-radius: 999px;
+  padding: 0 7px; font-size: .72rem; font-weight: 700;
+}
+.pal-col-body {
+  flex: 1; display: flex; flex-direction: column; gap: 7px;
+  padding: 9px 7px; min-height: 60px;
+  background: #f7f9fc; border: 1px solid var(--line); border-top: none;
+  border-radius: 0 0 9px 9px;
+}
+.pal-col-body.empty::after {
+  content: "vide"; color: #b7c0cd; font-size: .74rem; font-style: italic;
+  text-align: center; padding: 10px 0;
+}
+
+/* ---------------- Étiquette (attache) ---------------- */
+.chip {
+  position: relative;
+  display: flex; align-items: center; gap: 6px;
+  background: #fff; border: 1px solid var(--line); border-left: 4px solid var(--chip, #888);
+  border-radius: 8px; padding: 7px 9px;
+  font-size: .78rem; font-weight: 600; line-height: 1.2;
+  cursor: grab; user-select: none;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow .12s, transform .08s, opacity .12s;
+  touch-action: none;
+}
+.chip:hover { box-shadow: 0 4px 12px rgba(29,36,48,.14); transform: translateY(-1px); }
+.chip.dragging { opacity: .35; }
+.chip .chip-ico { flex: 0 0 auto; font-size: .95rem; line-height: 1; }
+.chip .chip-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip .chip-remove {
+  flex: 0 0 auto; border: none; background: transparent; color: var(--ink-soft);
+  cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 2px; border-radius: 4px;
+}
+.chip .chip-remove:hover { color: var(--red); background: var(--red-soft); }
+
+/* ---------------- Grille des machines ---------------- */
+.machines {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+.machine {
+  position: relative;
+  background: var(--bg-panel);
+  border: 2px solid var(--red);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: border-color .3s, box-shadow .3s, transform .12s;
+  display: flex; flex-direction: column;
+}
+.machine.ok { border-color: var(--green); }
+.machine.drop-hover { transform: translatey(-2px); box-shadow: 0 16px 40px rgba(29,36,48,.18); }
+.machine.drop-hover .machine-drop { background: #fff7ee; border-color: var(--orange); }
+
+.machine-top {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px 10px;
+  background: linear-gradient(180deg, #fbfcfe, #f4f7fb);
+  border-bottom: 1px solid var(--line);
+}
+.lego-wrap { flex: 0 0 auto; width: 120px; display: grid; place-items: center; }
+.lego-wrap svg { width: 100%; height: auto; display: block; }
+.machine-id { min-width: 0; flex: 1; }
+.machine-name { font-weight: 800; font-size: .92rem; letter-spacing: -.01em; line-height: 1.2; }
+.machine-meta { margin-top: 5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.badge {
+  font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+  background: #eef2f8; color: var(--ink-soft); border: 1px solid var(--line);
+}
+.badge.mat { background: #fff3e6; color: var(--orange-dk); border-color: #ffd9ad; }
+.badge.mat.missing { background: var(--red-soft); color: var(--red); border-color: #f6c9ca; }
+.badge.ton { background: #eaf1ff; color: #2f5fd0; border-color: #cfe0ff; }
+
+.machine-status {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 16px; font-size: .78rem; font-weight: 700;
+  color: var(--red); background: var(--red-soft);
+  transition: color .3s, background .3s;
+}
+.machine.ok .machine-status { color: var(--green); background: var(--green-soft); }
+.status-dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px rgba(229,72,77,.18); }
+.machine.ok .status-dot { box-shadow: 0 0 0 3px rgba(47,158,68,.18); }
+
+.machine-drop {
+  flex: 1;
+  margin: 12px; padding: 12px;
+  border: 2px dashed var(--line); border-radius: 10px;
+  background: #fafbfd;
+  display: flex; flex-direction: column; gap: 8px;
+  min-height: 92px;
+  transition: background .15s, border-color .15s;
+}
+.machine-drop-title { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-soft); font-weight: 700; }
+.machine-drop-empty { color: #aeb8c6; font-size: .8rem; font-style: italic; text-align: center; padding: 12px 0; }
+.machine-drop .chip { cursor: default; }
+
+/* ---------------- Ghost de glisser ---------------- */
+.drag-ghost {
+  position: fixed; top: 0; left: 0; z-index: 999;
+  pointer-events: none; opacity: 0; transform: translate(-9999px,-9999px);
+  transition: opacity .1s;
+}
+.drag-ghost.active { opacity: .96; }
+.drag-ghost .chip { box-shadow: 0 12px 30px rgba(29,36,48,.30); transform: rotate(-2deg) scale(1.04); }
+
+/* ---------------- Footer ---------------- */
+.footer { text-align: center; padding: 24px; color: var(--ink-soft); font-size: .78rem; }
+.footer code { background: #fff; padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 1100px) {
+  .palette { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 640px) {
+  .palette { grid-template-columns: repeat(2, 1fr); }
+  .machine-top { flex-direction: column; text-align: center; }
+  .lego-wrap { width: 150px; }
+  .topbar { padding: 12px 16px; }
+  main { padding: 16px 14px 50px; }
+}
+
+/* ---------------- Impression ---------------- */
+@media print {
+  .topbar-actions, .hint, .drag-ghost, .footer, .palette-section { display: none !important; }
+  body { background: #fff; }
+  .machine { break-inside: avoid; box-shadow: none; }
+  .machine-drop .chip-remove { display: none; }
+}
