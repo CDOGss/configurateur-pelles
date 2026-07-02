@@ -63,6 +63,12 @@ function unassign(attachId) {
   render();
 }
 
+/* ---------- Une pelle n'est valide qu'avec une vraie "attache" ---------- */
+// L'outil doit contenir le mot « attache » dans son nom (Attache UA62, etc.).
+function isAttache(name) {
+  return name.toLowerCase().includes("attache");
+}
+
 /* ---------- Icône selon le type d'attache ---------- */
 function iconFor(name) {
   const n = name.toLowerCase();
@@ -187,7 +193,8 @@ function renderPalette() {
 function renderMachines() {
   elMachines.innerHTML = MACHINES.map((m) => {
     const items = assigned[m.id].map((id) => ATTACH_BY_ID[id]).filter(Boolean);
-    const ok = items.length > 0;
+    const nbAttache = items.filter((a) => isAttache(a.name)).length;
+    const ok = nbAttache > 0; // valide seulement s'il y a une vraie "attache"
     const matMissing = m.matricule === "????";
     const details = items.length
       ? items.map((a) => chipHTML(a, { removable: true })).join("")
@@ -208,8 +215,10 @@ function renderMachines() {
         <div class="machine-status">
           <span class="status-dot"></span>
           ${ok
-            ? `Configurée · ${items.length} attache${items.length > 1 ? "s" : ""}`
-            : "Attache requise"}
+            ? `Configurée · ${nbAttache} attache${nbAttache > 1 ? "s" : ""}${items.length > nbAttache ? " + " + (items.length - nbAttache) + " outil" + (items.length - nbAttache > 1 ? "s" : "") : ""}`
+            : (items.length
+                ? `Attache requise · ${items.length} outil${items.length > 1 ? "s" : ""} sans attache`
+                : "Attache requise")}
         </div>
         <div class="machine-drop" data-drop="${m.id}">
           <div class="machine-drop-title">Détails / Attaches</div>
@@ -220,7 +229,9 @@ function renderMachines() {
 }
 
 function updateProgress() {
-  const done = MACHINES.filter((m) => assigned[m.id].length > 0).length;
+  const done = MACHINES.filter((m) =>
+    assigned[m.id].some((id) => ATTACH_BY_ID[id] && isAttache(ATTACH_BY_ID[id].name))
+  ).length;
   document.getElementById("progressCount").textContent = `${done} / ${MACHINES.length}`;
   document.getElementById("progressPill").classList.toggle("done", done === MACHINES.length);
 }
