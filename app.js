@@ -165,8 +165,20 @@ function legoSVG(machine) {
 /* ============================================================
    Rendu
    ============================================================ */
-const elPalette  = document.getElementById("palette");
-const elMachines = document.getElementById("machines");
+const elPalette     = document.getElementById("palette");
+const elMachines    = document.getElementById("machines");
+const elConfigPanel = document.getElementById("configPanel");
+
+// Pelle actuellement "montée" dans le panneau de configuration (transitoire)
+let activeMachineId = null;
+function setActiveMachine(id) {
+  activeMachineId = (id === activeMachineId) ? null : id;
+  render();
+  if (activeMachineId) {
+    // remonter en haut pour voir palette + panneau côte à côte
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+}
 
 function chipHTML(attach, { removable = false } = {}) {
   const color = couleurCol(attach.col);
@@ -195,42 +207,70 @@ function renderPalette() {
   }).join("");
 }
 
-function renderMachines() {
-  elMachines.innerHTML = MACHINES.map((m) => {
-    const items = assigned[m.id].map((id) => ATTACH_BY_ID[id]).filter(Boolean);
-    const nbAttache = items.filter((a) => isAttache(a.name)).length;
-    const ok = nbAttache > 0; // valide seulement s'il y a une vraie "attache"
-    const matMissing = m.matricule === "????";
-    const details = items.length
-      ? items.map((a) => chipHTML(a, { removable: true })).join("")
-      : '<div class="machine-drop-empty">Glissez une attache ici</div>';
-    return `
-      <article class="machine ${ok ? "ok" : ""}" data-machine="${m.id}">
-        <div class="machine-top">
-          <div class="lego-wrap">${legoSVG(m)}</div>
-          <div class="machine-id">
-            <div class="machine-name">${m.designation}</div>
-            <div class="machine-meta">
-              <span class="badge mat ${matMissing ? "missing" : ""}">Mat. ${m.matricule}</span>
-              <span class="badge ton">${m.tonnage} t</span>
-              <span class="badge">${m.type === "chenilles" ? "🚜 chenilles" : "🛞 pneus"}</span>
-            </div>
+// Carte d'une pelle. context = "grid" (en bas, cliquable) ou "panel" (à droite).
+function machineCardHTML(m, context) {
+  const items = assigned[m.id].map((id) => ATTACH_BY_ID[id]).filter(Boolean);
+  const nbAttache = items.filter((a) => isAttache(a.name)).length;
+  const ok = nbAttache > 0; // valide seulement s'il y a une vraie "attache"
+  const matMissing = m.matricule === "????";
+  const inPanel = context === "panel";
+  const details = items.length
+    ? items.map((a) => chipHTML(a, { removable: true })).join("")
+    : `<div class="machine-drop-empty">${inPanel ? "Glissez une attache ici →" : "Glissez une attache ici"}</div>`;
+  const statusTxt = ok
+    ? `Configurée · ${nbAttache} attache${nbAttache > 1 ? "s" : ""}${items.length > nbAttache ? " + " + (items.length - nbAttache) + " outil" + (items.length - nbAttache > 1 ? "s" : "") : ""}`
+    : (items.length
+        ? `Attache requise · ${items.length} outil${items.length > 1 ? "s" : ""} sans attache`
+        : "Attache requise");
+  return `
+    <article class="machine ${ok ? "ok" : ""} ${inPanel ? "in-panel" : ""}"
+             data-machine="${m.id}" ${context === "grid" ? 'data-select="1"' : ""}>
+      ${inPanel ? '<button class="config-close" id="btnCloseConfig" title="Fermer la configuration">✕ Fermer</button>' : ""}
+      <div class="machine-top">
+        <div class="lego-wrap">${legoSVG(m)}</div>
+        <div class="machine-id">
+          <div class="machine-name">${m.designation}</div>
+          <div class="machine-meta">
+            <span class="badge mat ${matMissing ? "missing" : ""}">Mat. ${m.matricule}</span>
+            <span class="badge ton">${m.tonnage} t</span>
+            <span class="badge">${m.type === "chenilles" ? "🚜 chenilles" : "🛞 pneus"}</span>
           </div>
         </div>
-        <div class="machine-status">
-          <span class="status-dot"></span>
-          ${ok
-            ? `Configurée · ${nbAttache} attache${nbAttache > 1 ? "s" : ""}${items.length > nbAttache ? " + " + (items.length - nbAttache) + " outil" + (items.length - nbAttache > 1 ? "s" : "") : ""}`
-            : (items.length
-                ? `Attache requise · ${items.length} outil${items.length > 1 ? "s" : ""} sans attache`
-                : "Attache requise")}
-        </div>
-        <div class="machine-drop" data-drop="${m.id}">
-          <div class="machine-drop-title">Détails / Attaches</div>
-          ${details}
-        </div>
-      </article>`;
+      </div>
+      <div class="machine-status">
+        <span class="status-dot"></span>${statusTxt}
+      </div>
+      <div class="machine-drop" data-drop="${m.id}">
+        <div class="machine-drop-title">Détails / Attaches</div>
+        ${details}
+      </div>
+    </article>`;
+}
+
+function renderMachines() {
+  // Grille du bas : la pelle active devient un emplacement "en configuration"
+  elMachines.innerHTML = MACHINES.map((m) => {
+    if (m.id === activeMachineId) {
+      return `
+        <article class="machine-slot" data-select="1" data-machine="${m.id}" title="Revenir à cette pelle">
+          <div class="machine-slot-lego">${legoSVG(m)}</div>
+          <div class="machine-slot-name">${m.designation}</div>
+          <div class="machine-slot-tag">⬆ En configuration</div>
+        </article>`;
+    }
+    return machineCardHTML(m, "grid");
   }).join("");
+
+  // Panneau de droite : pelle active ou invitation
+  const m = MACHINES.find((x) => x.id === activeMachineId);
+  elConfigPanel.classList.toggle("active", !!m);
+  elConfigPanel.innerHTML = m
+    ? machineCardHTML(m, "panel")
+    : `<div class="config-empty">
+         <div class="config-empty-ico">🖐️</div>
+         <div class="config-empty-title">Sélectionnez une pelle</div>
+         <div class="config-empty-text">Cliquez une pelle en bas : elle monte ici pour être configurée, à côté du stock.</div>
+       </div>`;
 }
 
 function updateProgress() {
@@ -311,10 +351,18 @@ function cleanupDrag() {
   drag = null;
 }
 
-/* ---------- Retrait d'une attache d'une machine ---------- */
+/* ---------- Clics : retrait d'attache, sélection de pelle, fermeture ---------- */
 document.addEventListener("click", (e) => {
-  const btn = e.target.closest("[data-remove]");
-  if (btn) unassign(btn.dataset.remove);
+  // 1) retirer une attache (prioritaire, ne doit pas sélectionner la pelle)
+  const btnRemove = e.target.closest("[data-remove]");
+  if (btnRemove) { e.stopPropagation(); unassign(btnRemove.dataset.remove); return; }
+
+  // 2) fermer le panneau de configuration → la pelle redescend
+  if (e.target.closest("#btnCloseConfig")) { activeMachineId = null; render(); return; }
+
+  // 3) cliquer une pelle en bas → la faire monter dans le panneau
+  const selectable = e.target.closest('[data-select="1"]');
+  if (selectable) setActiveMachine(selectable.dataset.machine);
 });
 
 /* ============================================================
@@ -327,7 +375,10 @@ document.getElementById("btnReset").addEventListener("click", () => {
     render();
   }
 });
-document.getElementById("btnExport").addEventListener("click", () => window.print());
+document.getElementById("btnExport").addEventListener("click", () => {
+  if (activeMachineId) { activeMachineId = null; render(); } // imprimer les 8 pelles entières
+  window.print();
+});
 document.getElementById("btnGit").href = REPO_URL;
 
 /* ---------- Go ---------- */

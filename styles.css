@@ -96,7 +96,7 @@ html, body {
 .btn-ghost { background: transparent; }
 
 /* ---------------- Sections ---------------- */
-main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
+main { max-width: 1820px; margin: 0 auto; padding: 22px 26px 60px; }
 .section-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: 26px 4px 12px; }
 .section-head h2 { margin: 0; font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; }
 .hint { font-size: .82rem; color: var(--ink-soft); }
@@ -160,12 +160,77 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 }
 .chip .chip-remove:hover { color: var(--red); background: var(--red-soft); }
 
+/* ---------------- Zone de travail : palette + panneau ---------------- */
+.workspace {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+.palette-section { flex: 1 1 auto; min-width: 0; } /* min-width:0 => la palette peut défiler */
+
+/* Panneau de configuration (à droite, collant) */
+.config-panel {
+  flex: 0 0 360px;
+  position: sticky;
+  top: 88px;
+  align-self: flex-start;
+  margin-top: 44px; /* aligne le haut du panneau avec le haut de la palette */
+  max-height: calc(100vh - 108px);
+  overflow: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow .25s, border-color .25s;
+}
+.config-panel.active { border-color: var(--orange); box-shadow: 0 16px 44px rgba(246,129,31,.22); }
+
+.config-empty {
+  padding: 40px 24px; text-align: center; color: var(--ink-soft);
+}
+.config-empty-ico { font-size: 2.4rem; }
+.config-empty-title { margin-top: 10px; font-weight: 800; color: var(--ink); }
+.config-empty-text { margin-top: 6px; font-size: .82rem; line-height: 1.4; }
+
+/* Carte de pelle dans le panneau (plus grande, pleine largeur) */
+.machine.in-panel {
+  border-width: 3px; border-radius: var(--radius);
+  animation: pop-in .28s ease;
+}
+@keyframes pop-in { from { transform: scale(.96); opacity: .4; } to { transform: scale(1); opacity: 1; } }
+.machine.in-panel .lego-wrap { width: 150px; }
+.machine.in-panel .machine-drop { min-height: 150px; }
+.config-close {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  border: 1px solid var(--line); background: #fff; color: var(--ink-soft);
+  font: inherit; font-weight: 700; font-size: .76rem; cursor: pointer;
+  padding: 5px 10px; border-radius: 8px;
+}
+.config-close:hover { color: var(--red); border-color: var(--red); background: var(--red-soft); }
+
+/* Emplacement laissé en bas quand la pelle est en configuration */
+.machine-slot {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 14px;
+  border: 2px dashed var(--orange); border-radius: var(--radius);
+  background: repeating-linear-gradient(45deg, #fff7ee, #fff7ee 10px, #fff 10px, #fff 20px);
+  cursor: pointer; text-align: center; min-height: 180px;
+  transition: box-shadow .15s, transform .1s;
+}
+.machine-slot:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.machine-slot-lego { width: 96px; opacity: .5; }
+.machine-slot-lego svg { width: 100%; height: auto; display: block; }
+.machine-slot-name { font-weight: 800; font-size: .82rem; }
+.machine-slot-tag { font-size: .72rem; font-weight: 700; color: var(--orange-dk); }
+
 /* ---------------- Grille des machines ---------------- */
 .machines {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 18px;
 }
+.machine[data-select] { cursor: pointer; }
+.machine[data-select]:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(29,36,48,.16); }
 .machine {
   position: relative;
   background: var(--bg-panel);
@@ -236,6 +301,15 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 .footer code { background: #fff; padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line); }
 
 /* ---------------- Responsive ---------------- */
+@media (max-width: 1280px) {
+  /* le panneau passe sous la palette et devient pleine largeur */
+  .workspace { flex-direction: column; }
+  .config-panel {
+    flex: none; width: 100%; position: static;
+    max-height: none; margin-top: 0; overflow: visible;
+  }
+  .machine.in-panel { max-width: 460px; margin: 0 auto; }
+}
 @media (max-width: 1100px) {
   .palette { grid-template-columns: repeat(4, 1fr); }
 }
@@ -249,7 +323,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 22px 26px 60px; }
 
 /* ---------------- Impression ---------------- */
 @media print {
-  .topbar-actions, .hint, .drag-ghost, .footer, .palette-section { display: none !important; }
+  .topbar-actions, .hint, .drag-ghost, .footer, .palette-section, .config-panel { display: none !important; }
   body { background: #fff; }
   .machine { break-inside: avoid; box-shadow: none; }
   .machine-drop .chip-remove { display: none; }
