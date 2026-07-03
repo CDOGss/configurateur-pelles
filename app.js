@@ -445,18 +445,32 @@ function construireConfig() {
   };
 }
 
-document.getElementById("btnSave").addEventListener("click", () => {
-  const data = construireConfig();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  const nom = `config-pelles-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`;
+// Déclenche le téléchargement d'un Blob sous un nom donné
+function telecharger(blob, nom) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = nom;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+document.getElementById("btnSave").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(construireConfig(), null, 2)], { type: "application/json" });
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  telecharger(blob, `config-pelles-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`);
+});
+
+// « Enregistrer pour l'équipe » → génère config-partagee.js pour le dossier partagé
+document.getElementById("btnTeam").addEventListener("click", () => {
+  const contenu = "window.SHARED_CONFIG = " + JSON.stringify(construireConfig(), null, 2) + ";\n";
+  telecharger(new Blob([contenu], { type: "application/javascript" }), "config-partagee.js");
+  alert(
+    "Fichier « config-partagee.js » téléchargé.\n\n" +
+    "➡ Déposez-le dans le dossier partagé, à côté de index.html (remplacez l'ancien).\n\n" +
+    "À la prochaine ouverture, tous les PC afficheront cette configuration."
+  );
 });
 
 // Le bouton "Charger" ouvre le sélecteur de fichier
@@ -478,9 +492,10 @@ fileLoad.addEventListener("change", (e) => {
 });
 
 // Applique une config chargée, en re-résolvant chaque attache dans le stock actuel
-function appliquerConfig(obj) {
+// opts.silencieux = true : n'affiche pas d'alerte (chargement auto du partage)
+function appliquerConfig(obj, opts = {}) {
   if (!obj || (!obj.machines && !obj.assigned)) {
-    alert("Ce fichier ne contient pas de configuration reconnue.");
+    if (!opts.silencieux) alert("Ce fichier ne contient pas de configuration reconnue.");
     return;
   }
   MACHINES.forEach((m) => { assigned[m.id] = []; clients[m.id] = ""; });
@@ -526,9 +541,35 @@ function appliquerConfig(obj) {
   activeMachineId = null;
   saveState();
   render();
-  alert(`Configuration chargée : ${placees} attache(s) placée(s)` +
-        (ignorees ? `, ${ignorees} ignorée(s) (absente(s) du stock actuel).` : "."));
+  if (!opts.silencieux) {
+    alert(`Configuration chargée : ${placees} attache(s) placée(s)` +
+          (ignorees ? `, ${ignorees} ignorée(s) (absente(s) du stock actuel).` : "."));
+  }
+}
+
+/* ============================================================
+   Config partagée (dossier réseau) : lecture auto de config-partagee.js
+   ============================================================ */
+const SHARED_DATE_KEY = "configPelles.sharedDate";
+function chargerConfigPartagee() {
+  const s = document.createElement("script");
+  s.src = "config-partagee.js"; // posé à côté de index.html dans le dossier partagé
+  s.onload = () => {
+    const sc = window.SHARED_CONFIG;
+    if (!sc || !sc.date) return;
+    // On applique la config d'équipe une seule fois par version (date), puis
+    // les retouches locales vivent en localStorage jusqu'au prochain fichier partagé.
+    if (localStorage.getItem(SHARED_DATE_KEY) !== sc.date) {
+      appliquerConfig(sc, { silencieux: true });
+      localStorage.setItem(SHARED_DATE_KEY, sc.date);
+      const tag = document.getElementById("sharedTag");
+      if (tag) { tag.hidden = false; tag.textContent = "👥 Config équipe chargée"; }
+    }
+  };
+  s.onerror = () => { /* pas de fichier partagé : usage local normal */ };
+  document.head.appendChild(s);
 }
 
 /* ---------- Go ---------- */
 render();
+chargerConfigPartagee();

@@ -94,6 +94,12 @@ html, body {
 .btn-primary:hover { background: var(--orange-dk); }
 .btn-git { background: var(--ink); border-color: var(--ink); color: #fff; }
 .btn-ghost { background: transparent; }
+.shared-tag {
+  display: inline-flex; align-items: center;
+  font-size: .74rem; font-weight: 700; color: var(--green);
+  background: var(--green-soft); border: 1px solid #bfe4c6;
+  padding: 5px 10px; border-radius: 999px;
+}
 
 /* ---------------- Sections ---------------- */
 main { max-width: 1820px; margin: 0 auto; padding: 22px 26px 60px; }

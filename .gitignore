@@ -1,4 +1,5 @@
 .claude/
+config-partagee.js
 ~$*.xlsx
 .DS_Store
 Thumbs.db
