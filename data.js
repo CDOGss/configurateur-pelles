@@ -58,6 +58,7 @@ const STOCK = {
     "Platine HB15",
     "Platine HB15",
     "Platine HB15",
+    "Platine HB15",
     "Fouille 600 140",
     "Fourche Palette",
     "Fouille 600 140",
@@ -87,14 +88,41 @@ const STOCK = {
     "Fouille 600",
     "BRH HB22",
     "BRH HB22",
-    "BRH HB22 plus vieux au soleil"
+    "BRH HB22 plus vieux au soleil",
+    "Arrivage attache UA 53 210",
+    "Arrivage attache UA 53 210",
+    "Arrivage attache UA 53 210",
+    "Arrivage fouille 1200",
+    "Arrivage fouille 1200",
+    "Arrivage fouille 1200",
+    "Arrivage squelette 1200",
+    "Arrivage platine HB22",
+    "Arrivage platine HB22",
+    "Arrivage platine HB22",
+    "Arrivage fouille 1200",
+    "Arrivage Curage 2000",
+    "Arrivage Fouille 600",
+    "Arrivage attache UA53"
   ],
   "DIAM90": [
     "Fouille 700 300",
     "Attache UA62",
     "Attache UA62",
     "BRH HB32",
-    "BRH HB32"
+    "BRH HB32",
+    "Arrivage fouille 1400 300",
+    "Arrivage attache UA63 350",
+    "Arrivage attache UA63 350",
+    "Arrivage attache UA63 350",
+    "Arrivage fouille 1500 350",
+    "Arrivage fouille 1500 350",
+    "Arrivage fouille 1500 350",
+    "Arrivage platine HB32",
+    "Arrivage platine HB32",
+    "Arrivage platine HB32",
+    "Arrivage attache UA63 360",
+    "Arrivage fouille 1500 360",
+    "Arrivage platine libre"
   ],
   "DIAM100": [
     "Fouille 1500 380",
@@ -109,12 +137,16 @@ const STOCK = {
     "Fouille Arden 500",
     "Curage Arden 1800",
     "Attache QCS60",
-    "Attache QCS60"
+    "Tilt X18"
   ],
   "S70": [
     "Fouille Arden 600",
     "Fouille 900",
-    "Curage Arden 2200"
+    "Curage Arden 2200",
+    "Adaptateur a souder platine",
+    "Attache QC70",
+    "Attache QC70",
+    "Tilt X26"
   ],
   "Dx100": [
     "Petit dx100",
@@ -131,7 +163,27 @@ const STOCK = {
     "Platine hb08",
     "Attache UA23",
     "Attache UA23",
-    "Attache UA23"
+    "Attache UA23",
+    "Arrivage Petit dx100",
+    "Arrivage Petit dx100",
+    "Arrivage Petit dx100",
+    "Arrivage Petit dx100",
+    "Arrivage Moyen dx100",
+    "Arrivage Moyen dx100",
+    "Arrivage Moyen dx100",
+    "Arrivage Moyen dx100",
+    "Arrivage Curage dx100",
+    "Arrivage Curage dx100",
+    "Arrivage Curage dx100",
+    "Arrivage Curage dx100",
+    "Arrivage Platine hb08",
+    "Arrivage Platine hb08",
+    "Arrivage Platine hb08",
+    "Arrivage Platine hb08",
+    "Arrivage Attache UA23",
+    "Arrivage Attache UA23",
+    "Arrivage Attache UA23",
+    "Arrivage Attache UA23"
   ]
 };
 

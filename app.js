@@ -25,6 +25,8 @@ function couleurCol(colId) {
 /* ---------- État (persisté) ---------- */
 // assigned[machineId] = [attacheId, ...] dans l'ordre d'affectation
 let assigned = loadState();
+// clients[machineId] = nom du client (renseigné à la vente)
+let clients = loadClients();
 
 function loadState() {
   try {
@@ -41,8 +43,21 @@ function loadState() {
   MACHINES.forEach((m) => (empty[m.id] = []));
   return empty;
 }
+function loadClients() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (raw && raw.clients) {
+      const valid = {};
+      MACHINES.forEach((m) => (valid[m.id] = raw.clients[m.id] || ""));
+      return valid;
+    }
+  } catch (e) { /* ignore */ }
+  const empty = {};
+  MACHINES.forEach((m) => (empty[m.id] = ""));
+  return empty;
+}
 function saveState() {
-  localStorage.setItem(STORE_KEY, JSON.stringify({ assigned }));
+  localStorage.setItem(STORE_KEY, JSON.stringify({ assigned, clients }));
 }
 
 /* ---------- Helpers d'état ---------- */
@@ -207,6 +222,13 @@ function renderPalette() {
   }).join("");
 }
 
+// Échappe une valeur pour l'insérer dans un attribut HTML en toute sécurité
+function escAttr(s) {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 // Carte d'une pelle. context = "grid" (en bas, cliquable) ou "panel" (à droite).
 function machineCardHTML(m, context) {
   const items = assigned[m.id].map((id) => ATTACH_BY_ID[id]).filter(Boolean);
@@ -236,6 +258,12 @@ function machineCardHTML(m, context) {
             <span class="badge">${m.type === "chenilles" ? "🚜 chenilles" : "🛞 pneus"}</span>
           </div>
         </div>
+      </div>
+      <div class="machine-client ${clients[m.id] ? "filled" : ""}">
+        <span class="machine-client-ico">👤</span>
+        <input type="text" class="machine-client-input" data-client="${m.id}"
+               value="${escAttr(clients[m.id] || "")}"
+               placeholder="Nom du client (à la vente)" autocomplete="off" />
       </div>
       <div class="machine-status">
         <span class="status-dot"></span>${statusTxt}
@@ -360,17 +388,30 @@ document.addEventListener("click", (e) => {
   // 2) fermer le panneau de configuration → la pelle redescend
   if (e.target.closest("#btnCloseConfig")) { activeMachineId = null; render(); return; }
 
-  // 3) cliquer une pelle en bas → la faire monter dans le panneau
+  // 3) clic dans le champ Client → ne pas sélectionner la pelle (garder le focus)
+  if (e.target.closest("[data-client]")) return;
+
+  // 4) cliquer une pelle en bas → la faire monter dans le panneau
   const selectable = e.target.closest('[data-select="1"]');
   if (selectable) setActiveMachine(selectable.dataset.machine);
+});
+
+/* ---------- Saisie du nom du client (sans re-render, pour garder le focus) ---------- */
+document.addEventListener("input", (e) => {
+  const input = e.target.closest("[data-client]");
+  if (!input) return;
+  const id = input.dataset.client;
+  clients[id] = input.value;
+  input.parentElement.classList.toggle("filled", !!input.value.trim());
+  saveState();
 });
 
 /* ============================================================
    Barre d'actions
    ============================================================ */
 document.getElementById("btnReset").addEventListener("click", () => {
-  if (confirm("Remettre toutes les pelles à zéro ?")) {
-    MACHINES.forEach((m) => (assigned[m.id] = []));
+  if (confirm("Remettre toutes les pelles à zéro (attaches et noms de client) ?")) {
+    MACHINES.forEach((m) => { assigned[m.id] = []; clients[m.id] = ""; });
     saveState();
     render();
   }
@@ -395,6 +436,7 @@ function construireConfig() {
       id: m.id,
       matricule: m.matricule,
       designation: m.designation,
+      client: clients[m.id] || "",
       attaches: assigned[m.id].map((id) => {
         const a = ATTACH_BY_ID[id];
         return { id: a.id, name: a.name, col: a.col };
@@ -441,7 +483,7 @@ function appliquerConfig(obj) {
     alert("Ce fichier ne contient pas de configuration reconnue.");
     return;
   }
-  MACHINES.forEach((m) => (assigned[m.id] = []));
+  MACHINES.forEach((m) => { assigned[m.id] = []; clients[m.id] = ""; });
   const used = new Set();
   let placees = 0, ignorees = 0;
 
@@ -463,6 +505,7 @@ function appliquerConfig(obj) {
         MACHINES.find((x) => x.designation === entry.designation) ||
         MACHINES.find((x) => x.id === entry.id);
       if (!m) { ignorees += (entry.attaches || []).length; return; }
+      if (entry.client) clients[m.id] = entry.client;
       (entry.attaches || []).forEach((at) => {
         const aid = resoudre(at);
         if (aid) { used.add(aid); assigned[m.id].push(aid); placees++; }

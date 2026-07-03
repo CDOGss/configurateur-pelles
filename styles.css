@@ -251,6 +251,32 @@ main { max-width: 1820px; margin: 0 auto; padding: 22px 26px 60px; }
   background: linear-gradient(180deg, #fbfcfe, #f4f7fb);
   border-bottom: 1px solid var(--line);
 }
+
+/* Champ Client (renseigné à la vente) */
+.machine-client {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+.machine-client-ico { flex: 0 0 auto; font-size: .95rem; opacity: .7; }
+.machine-client-input {
+  flex: 1; min-width: 0;
+  border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 10px; font: inherit; font-size: .82rem; font-weight: 600;
+  color: var(--ink); background: #fbfcfe;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.machine-client-input::placeholder { color: #aeb8c6; font-weight: 500; }
+.machine-client-input:focus {
+  outline: none; border-color: var(--orange); background: #fff;
+  box-shadow: 0 0 0 3px rgba(246,129,31,.15);
+}
+.machine-client.filled { background: var(--green-soft); border-bottom-color: #bfe4c6; }
+.machine-client.filled .machine-client-ico { opacity: 1; }
+.machine-client.filled .machine-client-input {
+  border-color: #bfe4c6; background: #fff; color: var(--green);
+}
 .lego-wrap { flex: 0 0 auto; width: 120px; display: grid; place-items: center; }
 .lego-wrap svg { width: 100%; height: auto; display: block; }
 .machine-id { min-width: 0; flex: 1; }
