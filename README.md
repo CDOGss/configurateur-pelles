@@ -13,11 +13,11 @@ Démonstrateur d'**amélioration continue** — 100 % statique, aucun serveur re
 
 La config est sauvegardée en `localStorage`, **propre à chaque PC** — elle n'est donc pas partagée entre postes. Pour une config commune sur un dossier réseau :
 
-1. Faites votre config, puis cliquez **« 👥 Équipe »** → un fichier `config-partagee.js` est téléchargé.
+1. Faites votre config, puis cliquez **« 💾 Sauvegarder »** → un fichier `config-partagee.js` est téléchargé.
 2. Déposez ce fichier dans le dossier partagé, **à côté de `index.html`** (remplacez l'ancien).
 3. À la prochaine ouverture, **tous les PC chargent automatiquement** cette config (indicateur « 👥 Config équipe chargée »).
 
-La config d'équipe s'applique **une fois par version** (repérée par sa date) ; ensuite chacun peut faire ses retouches locales jusqu'au dépôt d'un nouveau `config-partagee.js`. Les boutons **💾 Enregistrer / 📂 Charger** restent disponibles pour des fichiers `.json` individuels.
+La config d'équipe s'applique **une fois par version** (repérée par sa date) ; ensuite chacun peut faire ses retouches locales jusqu'au dépôt d'un nouveau `config-partagee.js`.
 
 > Note : une page web ne peut pas écrire de fichier toute seule (sécurité navigateur) ; la mise à jour du fichier partagé est donc un simple copier-coller manuel. Aucun serveur requis.
 

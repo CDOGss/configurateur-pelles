@@ -455,14 +455,7 @@ function telecharger(blob, nom) {
   URL.revokeObjectURL(url);
 }
 
-document.getElementById("btnSave").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(construireConfig(), null, 2)], { type: "application/json" });
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  telecharger(blob, `config-pelles-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.json`);
-});
-
-// « Enregistrer pour l'équipe » → génère config-partagee.js pour le dossier partagé
+// « Sauvegarder » → génère config-partagee.js pour le dossier partagé
 document.getElementById("btnTeam").addEventListener("click", () => {
   const contenu = "window.SHARED_CONFIG = " + JSON.stringify(construireConfig(), null, 2) + ";\n";
   telecharger(new Blob([contenu], { type: "application/javascript" }), "config-partagee.js");
@@ -471,24 +464,6 @@ document.getElementById("btnTeam").addEventListener("click", () => {
     "➡ Déposez-le dans le dossier partagé, à côté de index.html (remplacez l'ancien).\n\n" +
     "À la prochaine ouverture, tous les PC afficheront cette configuration."
   );
-});
-
-// Le bouton "Charger" ouvre le sélecteur de fichier
-const fileLoad = document.getElementById("fileLoad");
-document.getElementById("btnLoad").addEventListener("click", () => fileLoad.click());
-fileLoad.addEventListener("change", (e) => {
-  const f = e.target.files && e.target.files[0];
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      appliquerConfig(JSON.parse(reader.result));
-    } catch (err) {
-      alert("Fichier illisible : ce n'est pas un .json de configuration valide.");
-    }
-    fileLoad.value = ""; // permet de recharger le même fichier ensuite
-  };
-  reader.readAsText(f);
 });
 
 // Applique une config chargée, en re-résolvant chaque attache dans le stock actuel
