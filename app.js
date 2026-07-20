@@ -115,10 +115,56 @@ function studsRow(x0, x1, y, r) {
   return s;
 }
 
+// Chargeuse sur pneus (type "chargeuse") : godet frontal sur bras de levage
+function legoChargeuseSVG(tonnage, s) {
+  const roue = (cx) => `
+    <circle cx="${cx}" cy="120" r="21" fill="#23272d" stroke="#0f1216" stroke-width="2"/>
+    <circle cx="${cx}" cy="120" r="9" fill="#8a939f"/>
+    <circle cx="${cx}" cy="120" r="4" fill="#c7ccd4"/>`;
+  return `
+  <svg viewBox="0 0 210 152" xmlns="http://www.w3.org/2000/svg" role="img"
+       aria-label="Chargeuse sur pneus ${tonnage} tonnes">
+    <ellipse cx="105" cy="143" rx="96" ry="6" fill="rgba(0,0,0,.10)"/>
+    <g transform="translate(105 80) scale(${s}) translate(-105 -80)">
+      <!-- châssis -->
+      <rect x="58" y="94" width="126" height="24" rx="6" fill="#d96a0c" stroke="#b4570a" stroke-width="1.5"/>
+      <!-- capot moteur arrière -->
+      <rect x="130" y="74" width="54" height="28" rx="6" fill="#f6811f" stroke="#b4570a" stroke-width="1.5"/>
+      ${studsRow(136, 178, 71, 4)}
+      <!-- cabine -->
+      <rect x="90" y="52" width="42" height="44" rx="6" fill="#ffb46b" stroke="#b4570a" stroke-width="1.5"/>
+      <rect x="95" y="58" width="32" height="22" rx="3" fill="#bfe3ff" stroke="#7fb7e8"/>
+      ${studsRow(93, 129, 49, 3.6)}
+      <!-- gyrophare -->
+      <rect x="106" y="46" width="6" height="6" rx="1.5" fill="#ffd43b" stroke="#b4570a"/>
+      <!-- roues -->
+      ${roue(152)}${roue(76)}
+      <!-- vérin de cavage -->
+      <path d="M98,86 L58,102" stroke="#6b7482" stroke-width="6" stroke-linecap="round"/>
+      <path d="M98,86 L58,102" stroke="#c7ccd4" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- bras de levage -->
+      <path d="M96,104 L44,110" stroke="#b4570a" stroke-width="18" stroke-linecap="round"/>
+      <path d="M96,104 L44,110" stroke="#f6811f" stroke-width="13" stroke-linecap="round"/>
+      <!-- godet chargeur -->
+      <path d="M48,94 L16,99 L11,123 L50,126 Z" fill="#f6811f" stroke="#b4570a" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M11,123 L50,126" fill="none" stroke="#ffa24d" stroke-width="2.5"/>
+      <!-- articulations -->
+      <circle cx="96" cy="104" r="4" fill="#c7ccd4" stroke="#6b7482"/>
+      <circle cx="48" cy="110" r="3.5" fill="#c7ccd4" stroke="#6b7482"/>
+      <!-- tonnage gravé sur le capot -->
+      <text x="157" y="92" text-anchor="middle" font-family="Inter,sans-serif"
+            font-size="11" font-weight="800" fill="#fff">${tonnage}</text>
+    </g>
+  </svg>`;
+}
+
 function legoSVG(machine) {
   const { tonnage, type } = machine;
-  // échelle : 16,5 t → 0.72 ; 38 t → 1.06
-  const s = (0.72 + (Math.min(38, Math.max(16.5, tonnage)) - 16.5) / (38 - 16.5) * 0.34).toFixed(3);
+  // échelle : 13 t → 0.62 ; 38 t → 1.06 (la taille du dessin suit le tonnage)
+  const s = (0.62 + (Math.min(38, Math.max(13, tonnage)) - 13) / (38 - 13) * 0.44).toFixed(3);
+
+  // Une chargeuse a une silhouette totalement différente d'une pelle
+  if (type === "chargeuse") return legoChargeuseSVG(tonnage, s);
 
   // Train de roulement : chenilles ou pneus
   const under = type === "chenilles"
@@ -229,6 +275,13 @@ function renderPalette() {
   }).join("");
 }
 
+// Libellé du train de roulement / type de machine
+function badgeType(type) {
+  if (type === "chargeuse") return "🚧 chargeuse";
+  if (type === "pneus") return "🛞 pneus";
+  return "🚜 chenilles";
+}
+
 // Échappe une valeur pour l'insérer dans un attribut HTML en toute sécurité
 function escAttr(s) {
   return String(s)
@@ -262,7 +315,7 @@ function machineCardHTML(m, context) {
           <div class="machine-meta">
             <span class="badge mat ${matMissing ? "missing" : ""}">Mat. ${m.matricule}</span>
             <span class="badge ton">${m.tonnage} t</span>
-            <span class="badge">${m.type === "chenilles" ? "🚜 chenilles" : "🛞 pneus"}</span>
+            <span class="badge">${badgeType(m.type)}</span>
           </div>
         </div>
       </div>

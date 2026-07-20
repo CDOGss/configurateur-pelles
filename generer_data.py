@@ -82,15 +82,24 @@ def deduire_tonnage(designation):
 
 
 def deduire_type(designation):
-    """LC -> chenilles ; W/WR -> pneus ; sinon d'après les mots du libellé."""
+    """chargeuse / LC(R) -> chenilles / W(R) -> pneus ; sinon d'après le libellé."""
     s = sans_accent(designation)
+    # chargeuse sur pneus (silhouette différente d'une pelle)
+    if "chargeuse" in s or "loader" in s or re.search(r"\bdl\s*\d+", s):
+        return "chargeuse"
     if "chenille" in s:
         return "chenilles"
     if "pneu" in s:
         return "pneus"
-    m = re.search(r"dx\s*\d+\s*(lc|wr|w)\b", s)
+    # Doosan/Develon : DX###LC / LCR -> chenilles ; DX###W / WR -> pneus
+    m = re.search(r"dx\s*\d+\s*(lcr|lc|wr|w)", s)
     if m:
-        return "chenilles" if m.group(1) == "lc" else "pneus"
+        return "chenilles" if m.group(1).startswith("lc") else "pneus"
+    # Liebherr : A### -> sur pneus ; R### -> sur chenilles
+    if re.search(r"\ba\s*\d{3}\b", s):
+        return "pneus"
+    if re.search(r"\br\s*\d{3}\b", s):
+        return "chenilles"
     return None
 
 

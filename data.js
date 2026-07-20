@@ -245,5 +245,33 @@ const MACHINES = [
     "matricule": "????",
     "tonnage": 21,
     "type": "pneus"
+  },
+  {
+    "id": "m9",
+    "designation": "PELLE DX140LCR",
+    "matricule": "28234",
+    "tonnage": 14,
+    "type": "chenilles"
+  },
+  {
+    "id": "m10",
+    "designation": "CHARGEUSE DL220",
+    "matricule": "28803",
+    "tonnage": 13,
+    "type": "chargeuse"
+  },
+  {
+    "id": "m11",
+    "designation": "PELLE DX360LC-0",
+    "matricule": "28806",
+    "tonnage": 36,
+    "type": "chenilles"
+  },
+  {
+    "id": "m12",
+    "designation": "PELLE LIEBHERR A914",
+    "matricule": "28232",
+    "tonnage": 15,
+    "type": "pneus"
   }
 ];
