@@ -195,13 +195,20 @@ function setActiveMachine(id) {
   }
 }
 
-function chipHTML(attach, { removable = false } = {}) {
+// showCol : affiche le type d'attelage (colonne d'origine) sous le nom.
+// Utilisé sur les attaches posées sur une pelle, pour lever toute ambiguïté.
+function chipHTML(attach, { removable = false, showCol = false } = {}) {
   const color = couleurCol(attach.col);
+  const col = COL_BY_ID[attach.col];
+  const titreCol = col ? col.titre : attach.col;
   return `
     <div class="chip" data-id="${attach.id}" ${removable ? "" : 'data-draggable="1"'}
-         style="--chip:${color}" title="${attach.name} · ${attach.col}">
+         style="--chip:${color}" title="${attach.name} · ${titreCol}">
       <span class="chip-ico">${iconFor(attach.name)}</span>
-      <span class="chip-name">${attach.name}</span>
+      <span class="chip-body">
+        <span class="chip-name">${attach.name}</span>
+        ${showCol ? `<span class="chip-col" style="background:${color}">${titreCol}</span>` : ""}
+      </span>
       ${removable ? '<button class="chip-remove" data-remove="' + attach.id + '" title="Retirer">×</button>' : ""}
     </div>`;
 }
@@ -237,7 +244,7 @@ function machineCardHTML(m, context) {
   const matMissing = m.matricule === "????";
   const inPanel = context === "panel";
   const details = items.length
-    ? items.map((a) => chipHTML(a, { removable: true })).join("")
+    ? items.map((a) => chipHTML(a, { removable: true, showCol: true })).join("")
     : `<div class="machine-drop-empty">${inPanel ? "Glissez une attache ici →" : "Glissez une attache ici"}</div>`;
   const statusTxt = ok
     ? `Configurée · ${nbAttache} attache${nbAttache > 1 ? "s" : ""}${items.length > nbAttache ? " + " + (items.length - nbAttache) + " outil" + (items.length - nbAttache > 1 ? "s" : "") : ""}`

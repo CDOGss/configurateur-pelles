@@ -89,6 +89,7 @@ const STOCK = {
     "BRH HB22",
     "BRH HB22",
     "BRH HB22 plus vieux au soleil",
+    "BRH HB22 emballé plus vieux au soleil",
     "Arrivage attache UA 53 210",
     "Arrivage attache UA 53 210",
     "Arrivage attache UA 53 210",
